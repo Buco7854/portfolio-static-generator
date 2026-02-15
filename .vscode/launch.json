@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "command": "npx tsx scripts/build.ts --preview",
+      "name": "Preview server",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "portfolio-static",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "download-files": "npx tsx scripts/download-files.ts",
+    "build": "npm run download-files && npx tsx scripts/build.ts",
+    "preview": "npx tsx scripts/build.ts --preview"
+  },
+  "dependencies": {
+    "pocketbase": "^0.26.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "dotenv": "^17.3.1",
+    "lucide-static": "^0.564.0",
+    "tailwindcss": "^4.1.18",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
