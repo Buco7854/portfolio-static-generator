@@ -1,16 +1,18 @@
 name: Build & Sync to Output Repo
 
+# On garde l'annulation automatique en cas de lancements simultanés
+concurrency:
+  group: "deploy"
+  cancel-in-progress: true
+
 on:
-  # Rebuild on push to main
-  push:
-    branches: [main]
-
-  # Rebuild when triggered by PocketBase webhook
-  repository_dispatch:
-    types: [pocketbase-update]
-
-  # Allow manual trigger from GitHub UI
+  # Déclenchement EXCLUSIVEMENT manuel
   workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Message de commit pour le déploiement'
+        required: true
+        type: string
 
 jobs:
   build-and-sync:
@@ -40,10 +42,7 @@ jobs:
 
       - name: Sync dist to output repo
         run: |
-          # Remove everything except .git and CNAME
           find output -maxdepth 1 -not -name '.git' -not -name 'CNAME' -not -name 'output' -not -name '.' | xargs rm -rf
-
-          # Copy dist contents
           cp -r dist/* output/
 
       - name: Commit and push
@@ -54,13 +53,9 @@ jobs:
 
           git add -A
 
-          # Use commit message from PocketBase hook, fallback to "update site"
-          MESSAGE="${{ github.event.client_payload.commit_message }}"
-          if [ -z "$MESSAGE" ]; then
-            MESSAGE="update site"
-          fi
+          # On récupère directement le message manuel (qui est désormais obligatoire)
+          MESSAGE="${{ inputs.commit_message }}"
 
-          # Only commit if there are changes
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
