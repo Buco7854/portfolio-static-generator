@@ -107,10 +107,36 @@ async function main() {
   console.log("Generating pages...");
   let pageCount = 0;
 
-  // Root redirect
+  // Root redirect based on browser language
+  const supportedLangs = JSON.stringify(languages.map((l) => l.code));
   await writePage(
     join(DIST, "index.html"),
-    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=/${defaultLang.code}"></head><body></body></html>`
+    `<!DOCTYPE html>
+<html lang="${defaultLang.code}">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    (function() {
+      var supported = ${supportedLangs};
+      var fallback = "${defaultLang.code}";
+      
+      // Récupérer la langue du navigateur (ex: "fr-FR" -> "fr")
+      var userLang = (navigator.language || navigator.userLanguage || "").split('-')[0].toLowerCase();
+      
+      // Vérifier si la langue de l'utilisateur fait partie des langues supportées
+      var targetLang = supported.includes(userLang) ? userLang : fallback;
+      
+      // Redirection transparente
+      window.location.replace("/" + targetLang);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=/${defaultLang.code}">
+  </noscript>
+</head>
+<body></body>
+</html>`
   );
   pageCount++;
 
